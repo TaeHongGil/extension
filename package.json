@@ -1,0 +1,760 @@
+{
+  "name": "dug-extension",
+  "displayName": "DUG Extension",
+  "description": "DUG Extension",
+  "author": {
+    "name": "길태홍"
+  },
+  "icon": "resources/dug_logo.png",
+  "version": "1.1.3",
+  "extensionPack": [
+    "vscjava.vscode-java-pack",
+    "ms-vscode.cpptools-extension-pack",
+    "dugdslee.WFontPlugIn"
+  ],
+  "engines": {
+    "vscode": "^1.67.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "publisher": "DOUBLEUGAMES",
+  "activationEvents": [
+    "onView:dugExplorer"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsWelcome": [
+      {
+        "view": "dug.project",
+        "contents": "JVM 또는 Gradle 경로가 설정되지 않았습니다. \n [DUG Setting](command:dug.dug.setting)",
+        "when": "!config.DUG.jvmHome || !config.DUG.gradleHome"
+      },
+      {
+        "view": "tomcat.instances",
+        "contents": "JVM 또는 Gradle 경로가 설정되지 않았습니다.",
+        "when": "!config.DUG.jvmHome || !config.DUG.gradleHome"
+      },
+      {
+        "view": "sftp.directory",
+        "contents": "Priavte Key 경로를 지정하세요.\n [DUG Setting](command:dug.dug.setting)",
+        "when": "!config.DUG.privateKeyPath"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dugExplorer",
+          "title": "DUG",
+          "icon": "resources/dug_view.png"
+        }
+      ]
+    },
+    "views": {
+      "dugExplorer": [
+        {
+          "id": "dug.project",
+          "name": "Project",
+          "contextualTitle": "DUG"
+        },
+        {
+          "id": "tomcat.instances",
+          "name": "Tomcat",
+          "contextualTitle": "DUG"
+        },
+        {
+          "id": "sftp.directory",
+          "name": "SFTP",
+          "contextualTitle": "DUG"
+        }
+      ]
+    },
+    "configuration": [
+      {
+        "title": "DUG JVM Settings",
+        "properties": {
+          "DUG.jvmHome": {
+            "type": "string",
+            "default": "",
+            "description": "JVM 8 Home 경로"
+          }
+        }
+      },
+      {
+        "title": "DUC Simulation Core Version",
+        "properties": {
+          "DUG.simulationVersion": {
+            "type": "string",
+            "default": "2.0.0.21-SNAPSHOT",
+            "description": "DUC 시뮬레이션 코어 버전"
+          }
+        }
+      },
+      {
+        "title": "DUG NDK Settings",
+        "properties": {
+          "DUG.ndkHome": {
+            "type": "string",
+            "default": "",
+            "description": "NDK Path"
+          }
+        }
+      },
+      {
+        "title": "DUG Gradle Settings",
+        "properties": {
+          "DUG.gradleHome": {
+            "type": "string",
+            "default": "",
+            "description": "Gradle 2.14.1 경로"
+          }
+        }
+      },
+      {
+        "title": "DUG Tomcat Instances",
+        "properties": {
+          "DUG.tomcatInstances": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "Tomcat Instance",
+              "required": [
+                "name",
+                "catalinaHome"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of Instance"
+                },
+                "catalinaHome": {
+                  "type": "string",
+                  "description": "Catalina home of the instance"
+                }
+              }
+            },
+            "default": null,
+            "description": "Installed Tomcat Instances"
+          }
+        }
+      },
+      {
+        "title": "DUG Directory Settings",
+        "properties": {
+          "DUG.projectGroup": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "title": "DUG Directory Setting"
+            },
+            "default": [
+              "dug",
+              "duc"
+            ],
+            "description": "DUG Directory에 포함할 Projects"
+          }
+        }
+      },
+      {
+        "title": "DUG SFTP Instances",
+        "properties": {
+          "DUG.sftpInstances": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "SFTP Instance",
+              "required": [
+                "host",
+                "port",
+                "user"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Host of Instance"
+                },
+                "port": {
+                  "type": "number",
+                  "description": "Port of Instance"
+                },
+                "user": {
+                  "type": "string",
+                  "description": "User of Instance"
+                }
+              }
+            },
+            "default": null,
+            "description": "SFTP Instances"
+          }
+        }
+      },
+      {
+        "title": "DUG SFTP Bookmarks",
+        "properties": {
+          "DUG.sftpBookmarks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "SFTP Bookmark",
+              "required": [
+                "server",
+                "path"
+              ],
+              "properties": {
+                "server": {
+                  "type": "string",
+                  "description": "Server Name of Bookmark"
+                },
+                "path": {
+                  "type": "string",
+                  "description": "Path of Bookmark"
+                }
+              }
+            },
+            "default": null,
+            "description": "SFTP Bookmarks"
+          }
+        }
+      },
+      {
+        "title": "DUG SFTP Priavte Key Path",
+        "properties": {
+          "DUG.privateKeyPath": {
+            "type": "string",
+            "default": "",
+            "description": "SFTP Priavte Key Path"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "dugExplorer.refresh",
+        "title": "Explorer Refresh"
+      },
+      {
+        "command": "dugExplorer.project.refresh",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "dugExplorer.tomcat.add",
+        "title": "Add",
+        "icon": {
+          "light": "resources/light/add.svg",
+          "dark": "resources/dark/add.svg"
+        }
+      },
+      {
+        "command": "dugExplorer.tomcat.refresh",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "dugExplorer.sftp.add",
+        "title": "add",
+        "icon": {
+          "light": "resources/light/add.svg",
+          "dark": "resources/dark/add.svg"
+        }
+      },
+      {
+        "command": "dugExplorer.sftp.bookmark.expand",
+        "title": "Bookmarks",
+        "icon": {
+          "light": "resources/light/bookmark.svg",
+          "dark": "resources/dark/bookmark.svg"
+        }
+      },
+      {
+        "command": "dugExplorer.sftp.refresh",
+        "title": "Refresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "dugExplorer.sftp.connect",
+        "title": "Connect",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.sftp.disconnect",
+        "title": "Disconnect",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.sftp.upload",
+        "title": "Upload",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.sftp.download",
+        "title": "Download",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.sftp.delete",
+        "title": "Delete",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.sftp.mkdir",
+        "title": "Make Folder",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.sftp.preview",
+        "title": "Text Preview",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.sftp.bookmark.add",
+        "title": "Add Bookmark",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.tomcat.run",
+        "title": "Run",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.tomcat.stop",
+        "title": "Stop",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.tomcat.open.serverxml",
+        "title": "Open server.xml",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.tomcat.open.log",
+        "title": "Open Log",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.tomcat.open.home",
+        "title": "Open Tomcat Folder",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.maven.install",
+        "title": "Maven Install",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.maven.deploy",
+        "title": "Maven Deploy",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.maven.eclipse",
+        "title": "Maven Eclipse",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.duc.slot.simulation.update",
+        "title": "Local Simulation Refresh",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.maven.create.slot.simulation",
+        "title": "Create DUC Simulation Project",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.maven.create.slot.ui",
+        "title": "Create DUC Ui Project",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.maven.create.meta.ui",
+        "title": "Create DUC Meta Ui Project",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.duc.slot.resource.upload",
+        "title": "DUC Resource Upload",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.duc.slot.thumbnail.upload",
+        "title": "DUC Thumbnail Upload",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.maven.update",
+        "title": "Maven Update",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.gradle.task",
+        "title": "Gradle Task",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.gradle.task.publish",
+        "title": "Gradle Task (Publish Animate)",
+        "category": "DUG"
+      },
+      {
+        "command": "dugExplorer.maven.webpack",
+        "title": "Webpack",
+        "category": "DUG"
+      },
+      {
+        "command": "dug.crash.check",
+        "title": "Mobile Crash Check",
+        "category": "DUG"
+      },
+      {
+        "command": "dug.dug.setting",
+        "title": "DUG Setting",
+        "category": "DUG"
+      },
+      {
+        "command": "dug.crash.setting",
+        "title": "Crash Check Setting",
+        "category": "DUG"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "dugExplorer.gradle.task",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.gradle.task.publish",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.maven.install",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.tomcat.add",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.tomcat.refresh",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.project.refresh",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.connect",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.disconnect",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.upload",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.download",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.delete",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.mkdir",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.preview",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.bookmark.add",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.add",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.bookmark.expand",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.sftp.refresh",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.tomcat.run",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.tomcat.open.home",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.tomcat.open.log",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.tomcat.open.serverxml",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.tomcat.stop",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.maven.install",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.maven.update",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.maven.eclipse",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.maven.deploy",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.maven.webpack",
+          "when": "false"
+        },
+        {
+          "command": "dugExplorer.duc.slot.simulation.update",
+          "when": "false"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "dugExplorer.tomcat.add",
+          "when": "view == tomcat.instances",
+          "group": "navigation"
+        },
+        {
+          "command": "dugExplorer.tomcat.refresh",
+          "when": "view == tomcat.instances",
+          "group": "navigation"
+        },
+        {
+          "command": "dugExplorer.sftp.bookmark.expand",
+          "when": "view == sftp.directory",
+          "group": "navigation"
+        },
+        {
+          "command": "dugExplorer.sftp.refresh",
+          "when": "view == sftp.directory",
+          "group": "navigation"
+        },
+        {
+          "command": "dugExplorer.sftp.add",
+          "when": "view == sftp.directory",
+          "group": "navigation"
+        },
+        {
+          "command": "dugExplorer.project.refresh",
+          "when": "view == dug.project",
+          "group": "navigation"
+        },
+        {
+          "command": "dugExplorer.maven.create.slot.simulation",
+          "when": "view == dug.project",
+          "group": "creation"
+        },
+        {
+          "command": "dugExplorer.maven.create.slot.ui",
+          "when": "view == dug.project",
+          "group": "creation"
+        },
+        {
+          "command": "dugExplorer.maven.create.meta.ui",
+          "when": "view == dug.project",
+          "group": "creation"
+        },
+        {
+          "command": "dugExplorer.duc.slot.resource.upload",
+          "when": "view == dug.project",
+          "group": "upload"
+        },
+        {
+          "command": "dugExplorer.duc.slot.thumbnail.upload",
+          "when": "view == dug.project",
+          "group": "upload"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "dugExplorer.sftp.connect",
+          "group": "actions",
+          "when": "view == sftp.directory && viewItem == 'server'"
+        },
+        {
+          "command": "dugExplorer.sftp.disconnect",
+          "group": "actions",
+          "when": "view == sftp.directory && viewItem == 'server'"
+        },
+        {
+          "command": "dugExplorer.sftp.preview",
+          "group": "1",
+          "when": "view == sftp.directory && viewItem == 'file'"
+        },
+        {
+          "command": "dugExplorer.sftp.upload",
+          "group": "2",
+          "when": "view == sftp.directory && (viewItem == 'directory' || viewItem == 'file')"
+        },
+        {
+          "command": "dugExplorer.sftp.download",
+          "group": "2",
+          "when": "view == sftp.directory && (viewItem == 'directory' || viewItem == 'file')"
+        },
+        {
+          "command": "dugExplorer.sftp.delete",
+          "group": "3",
+          "when": "view == sftp.directory && (viewItem == 'directory' || viewItem == 'file')"
+        },
+        {
+          "command": "dugExplorer.sftp.mkdir",
+          "group": "3",
+          "when": "view == sftp.directory && (viewItem == 'directory' || viewItem == 'file')"
+        },
+        {
+          "command": "dugExplorer.sftp.bookmark.add",
+          "group": "4",
+          "when": "view == sftp.directory && (viewItem == 'directory' || viewItem == 'file')"
+        },
+        {
+          "command": "dugExplorer.tomcat.run",
+          "group": "actions",
+          "when": "view == tomcat.instances"
+        },
+        {
+          "command": "dugExplorer.tomcat.stop",
+          "group": "actions",
+          "when": "view == tomcat.instances"
+        },
+        {
+          "command": "dugExplorer.tomcat.open.serverxml",
+          "group": "setting",
+          "when": "view == tomcat.instances"
+        },
+        {
+          "command": "dugExplorer.tomcat.open.log",
+          "group": "setting",
+          "when": "view == tomcat.instances"
+        },
+        {
+          "command": "dugExplorer.tomcat.open.home",
+          "group": "setting",
+          "when": "view == tomcat.instances"
+        },
+        {
+          "command": "dugExplorer.maven.install",
+          "group": "maven",
+          "when": "view == dug.project"
+        },
+        {
+          "command": "dugExplorer.maven.deploy",
+          "group": "maven",
+          "when": "view == dug.project"
+        },
+        {
+          "command": "dugExplorer.maven.eclipse",
+          "group": "maven",
+          "when": "view == dug.project"
+        },
+        {
+          "command": "dugExplorer.maven.update",
+          "group": "maven",
+          "when": "view == dug.project"
+        },
+        {
+          "command": "dugExplorer.duc.slot.simulation.update",
+          "group": "simulation",
+          "when": "view == dug.project && viewItem == 'simulation'"
+        },
+        {
+          "command": "dugExplorer.maven.webpack",
+          "group": "ui",
+          "when": "view == dug.project"
+        },
+        {
+          "command": "dugExplorer.gradle.task",
+          "group": "ui",
+          "when": "view == dug.project"
+        },
+        {
+          "command": "dugExplorer.gradle.task.publish",
+          "group": "ui",
+          "when": "view == dug.project"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.2",
+    "@types/glob": "^7.2.0",
+    "@types/mkdirp": "^1.0.2",
+    "@types/mocha": "^9.1.0",
+    "@types/node": "14.x",
+    "@types/rimraf": "^3.0.2",
+    "@types/ssh2-sftp-client": "^9.0.4",
+    "@types/string-natural-compare": "^3.0.4",
+    "@types/vscode": "^1.67.0",
+    "@types/yauzl": "^2.10.3",
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "@vscode/test-electron": "^2.1.2",
+    "eslint": "^8.9.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "glob": "^7.2.0",
+    "mocha": "^9.2.1",
+    "node-loader": "^2.0.0",
+    "prettier": "^3.3.3",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.5",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "@types/istextorbinary": "^2.3.4",
+    "archiver": "^7.0.1",
+    "axios": "^1.7.7",
+    "date-and-time": "^2.3.1",
+    "dayjs": "^1.11.13",
+    "eslint-plugin-n": "^17.10.2",
+    "eslint-plugin-promise": "^7.1.0",
+    "istextorbinary": "^9.5.0",
+    "plugin-import": "^1.0.52",
+    "ssh2-sftp-client": "^11.0.0",
+    "string-natural-compare": "^3.0.1",
+    "yauzl": "^3.1.3"
+  }
+}

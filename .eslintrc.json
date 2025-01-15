@@ -1,0 +1,58 @@
+{
+  "root": true,
+  "plugins": [
+    "@typescript-eslint",
+    "prettier",
+    "promise"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "plugin:promise/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "./",
+    "sourceType": "module"
+  },
+  "rules": {
+    //prettier사용
+    "prettier/prettier": [
+      "error",
+      {
+        "printWidth": 200,
+        "singleQuote": true,
+        "endOfLine": "auto",
+        "trailingComma": "all",
+        "tabWidth": 2
+      }
+    ],
+    "no-var": "error", // var 사용
+    "@typescript-eslint/no-unused-vars": "off", //사용하지 않는 변수
+    "@typescript-eslint/no-explicit-any": "off", // any 사용
+    "promise/catch-or-return": "off",
+    "promise/always-return": "off",
+    "no-multiple-empty-lines": [
+      "error",
+      {
+        "max": 1
+      }
+    ], //개행 제한,
+    "lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
+    ] //메소드,변수끼리 줄바꿈
+  },
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    "docker-local-db",
+    "public",
+    "ui"
+  ]
+}

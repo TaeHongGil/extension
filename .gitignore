@@ -1,0 +1,11 @@
+out
+dist
+node_modules
+.vscode-test/
+*.vsix
+script/test*
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
+.DS_Store

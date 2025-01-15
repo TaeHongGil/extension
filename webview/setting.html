@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline' 'unsafe-eval';" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DUG 설정</title>
+    <style>
+      #settingsForm {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 1px solid var(--vscode-settings-textInputBorder, #ddd);
+        border-radius: 5px;
+        background-color: var(--vscode-settings-textInputBackground, #f9f9f9);
+      }
+
+      input[type='text'],
+      input[type='number'] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid var(--vscode-settings-textInputBorder, #ccc);
+        border-radius: 4px;
+        background-color: var(--vscode-input-background, #fff);
+        color: var(--vscode-input-foreground, #000);
+      }
+
+      button {
+        padding: 10px 15px;
+        background-color: var(--vscode-button-background, #007acc);
+        color: var(--vscode-button-foreground, #fff);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: var(--vscode-button-hoverBackground, #005fa3);
+      }
+
+      #sftpList,
+      #tomcatList {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      #sftpList li,
+      #tomcatList li {
+        padding: 10px;
+        margin-bottom: 8px;
+        border: 1px solid var(--vscode-settings-textInputBorder, #ddd);
+        border-radius: 5px;
+        background-color: var(--vscode-settings-textInputBackground, #f4f4f4);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .sm {
+        margin: 5px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        border-radius: 0.2rem;
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+      }
+
+      .md {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <div class="row md" style="justify-content: space-between">
+        <h1>DUG 설정</h1>
+        <button onclick="openLink()">버그 제보 및 건의사항</button>
+      </div>
+      <div class="md">
+        <button onclick="setDefaultSettings()">Default Setting</button>
+      </div>
+      <div style="display: flex; flex-direction: column">
+        <label class="md">기본 경로 : ~/dugSetting</label>
+        <label class="md">- JDK8, Gradle-2.14.1, Tomcat-8.5 설치</label>
+        <label class="md">- JVM Home 및 Gradle Home 초기화, tomcat(DUG), sftp(DUC) 추가</label>
+      </div>
+    </div>
+    <div>
+      <h2>Settings</h2>
+      <div id="settingsForm">
+        <div class="row">
+          <h3>JVM Home</h3>
+          <button class="sm" onclick="getPath('jvmHome', 'folder')">import</button>
+        </div>
+        <input type="text" id="jvmHome" />
+        <div class="row">
+          <h3>Gradle Home</h3>
+          <button class="sm" onclick="getPath('gradleHome', 'folder')">import</button>
+        </div>
+        <input type="text" id="gradleHome" />
+        <h3>Project Group (comma separated)</h3>
+        <input type="text" id="projectGroup" />
+        <div class="row">
+          <h3>SFTP Private Key Path</h3>
+          <button class="sm" onclick="getPath('privateKeyPath', 'file')">import</button>
+        </div>
+        <input type="text" id="privateKeyPath" />
+        <button onclick="saveSettings()">저장</button>
+      </div>
+    </div>
+    <div>
+      <h2>Tomcat Instances</h2>
+      <ul id="tomcatList"></ul>
+    </div>
+    <div>
+      <h2>SFTP Instances</h2>
+      <ul id="sftpList"></ul>
+    </div>
+
+    <script>
+      //@ sourceURL=extension.setting
+      const vscode = acquireVsCodeApi();
+
+      window.addEventListener('load', () => {
+        sendMessage('init');
+      });
+
+      function openLink() {
+        sendMessage('openConfluence');
+      }
+
+      function sendMessage(command, data = {}) {
+        vscode.postMessage({ command, data });
+      }
+
+      function saveSettings() {
+        const jvmHome = getValueById('jvmHome');
+        const gradleHome = getValueById('gradleHome');
+        const projectString = getValueById('projectGroup');
+        const projectGroup = projectString ? projectString.split(',').map((s) => s.trim()) : [];
+        const privateKeyPath = getValueById('privateKeyPath');
+
+        sendMessage('saveSettings', { jvmHome, gradleHome, projectGroup, privateKeyPath });
+      }
+
+      function setDefaultSettings() {
+        sendMessage('setDefaultSettings');
+      }
+
+      function getPath(id, type) {
+        sendMessage('getPath', { id, type });
+      }
+
+      function updateTomcatList(tomcatInstances) {
+        const tomcatList = document.getElementById('tomcatList');
+        tomcatList.innerHTML = '';
+        tomcatInstances.forEach((instance) => {
+          const li = document.createElement('li');
+          li.textContent = `${instance.name} - ${instance.catalinaHome}`;
+          const deleteButton = createButton('삭제', () => sendMessage('deleteTomcat', { name: instance.name }));
+          li.appendChild(deleteButton);
+          tomcatList.appendChild(li);
+        });
+      }
+
+      function updateSftpList(sftpInstances) {
+        const sftpList = document.getElementById('sftpList');
+        sftpList.innerHTML = '';
+        sftpInstances.forEach((instance) => {
+          const li = document.createElement('li');
+          li.textContent = `${instance.name} - ${instance.user}@${instance.host}:${instance.port}`;
+          const deleteButton = createButton('삭제', () => sendMessage('deleteSftp', { name: instance.name }));
+          li.appendChild(deleteButton);
+          sftpList.appendChild(li);
+        });
+      }
+
+      function loadSettings(settings) {
+        setValueById('jvmHome', settings.jvmHome || '');
+        setValueById('gradleHome', settings.gradleHome || '');
+        setValueById('projectGroup', (settings.projectGroup || []).join(', '));
+        setValueById('privateKeyPath', settings.privateKeyPath || '');
+        updateTomcatList(settings.tomcatInstances || []);
+        updateSftpList(settings.sftpInstances || []);
+      }
+
+      function getValueById(id) {
+        return document.getElementById(id).value;
+      }
+
+      function setValueById(id, value) {
+        document.getElementById(id).value = value;
+      }
+
+      function createButton(text, onClick) {
+        const button = document.createElement('button');
+        button.textContent = text;
+        button.className = 'sm';
+        button.addEventListener('click', onClick);
+        return button;
+      }
+
+      window.addEventListener('message', (event) => {
+        const { command, data } = event.data;
+        switch (command) {
+          case 'updateTomcatList':
+            updateTomcatList(data);
+            break;
+          case 'updateSftpList':
+            updateSftpList(data);
+            break;
+          case 'loadSettings':
+            loadSettings(data);
+            break;
+          case 'import':
+            setValueById(data.id, data.path);
+            break;
+        }
+      });
+    </script>
+  </body>
+</html>
